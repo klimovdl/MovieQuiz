@@ -94,6 +94,9 @@
                                     <constraint firstAttribute="height" constant="60" id="pnp-oq-lLn"/>
                                 </constraints>
                             </stackView>
+                            <activityIndicatorView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" style="medium" translatesAutoresizingMaskIntoConstraints="NO" id="OHK-hK-b2C">
+                                <rect key="frame" x="197" y="438" width="20" height="20"/>
+                            </activityIndicatorView>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                         <color key="backgroundColor" name="YP Black (ios)"/>
@@ -102,6 +105,8 @@
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="bottom" secondItem="sXk-oI-e15" secondAttribute="bottom" constant="80" id="Egi-Tr-BK3"/>
                             <constraint firstItem="sXk-oI-e15" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" constant="10" id="G2q-KN-rTo"/>
                             <constraint firstItem="sXk-oI-e15" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="20" id="GfF-4A-9wm"/>
+                            <constraint firstItem="OHK-hK-b2C" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="O3F-q2-i3j"/>
+                            <constraint firstItem="OHK-hK-b2C" firstAttribute="centerY" secondItem="8bC-Xf-vdC" secondAttribute="centerY" id="VgV-HA-RIl"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="bottom" secondItem="H5i-im-cs9" secondAttribute="bottom" id="XNz-71-THZ"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="Dfk-hk-T9S" secondAttribute="trailing" constant="20" id="hM4-RB-Pi3"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="sXk-oI-e15" secondAttribute="trailing" constant="20" id="mas-45-Aap"/>
@@ -110,6 +115,7 @@
                         </constraints>
                     </view>
                     <connections>
+                        <outlet property="activityIndicator" destination="OHK-hK-b2C" id="9Y3-Oc-9Po"/>
                         <outlet property="counterLabel" destination="VaR-hA-8Dl" id="MDZ-wF-87B"/>
                         <outlet property="imageView" destination="23N-tw-hvY" id="APF-BM-QeJ"/>
                         <outlet property="noButton" destination="I97-qK-qiC" id="4JN-V5-Kee"/>
