@@ -41,21 +41,34 @@ final class QuestionFactory: QuestionFactoryProtocol {
     func requestNextQuestion() {
         DispatchQueue.global().async { [weak self] in
             guard let self = self, !self.movies.isEmpty else { return }
-            let index = Int.random(in: 0..<self.movies.count)
-            let movie = self.movies[index]
+            let movie = self.movies.randomElement()!
+
             var imageData = Data()
             do {
                 imageData = try Data(contentsOf: movie.resizedImageURL)
-            } catch {
+            } catch { }
+
+            let ratingValue = Float(movie.rating) ?? 0
+            let thresholds: [Float] = Array(stride(from: 5, through: 9, by: 0.5))
+            let threshold = thresholds.randomElement()!
+            let askGreater = Bool.random()
+
+            let text: String
+            let correctAnswer: Bool
+            if askGreater {
+                text = "Рейтинг этого фильма больше чем \(threshold)?"
+                correctAnswer = ratingValue > threshold
+            } else {
+                text = "Рейтинг этого фильма меньше чем \(threshold)?"
+                correctAnswer = ratingValue < threshold
             }
-            let rating = Float(movie.rating) ?? 0
-            let text = "Рейтинг этого фильма больше чем 7?"
-            let correctAnswer = rating > 7
+
             let question = QuizQuestion(
                 image: imageData,
                 text: text,
                 correctAnswer: correctAnswer
             )
+
             DispatchQueue.main.async {
                 self.delegate?.didReceiveNextQuestion(question: question)
             }
@@ -63,7 +76,6 @@ final class QuestionFactory: QuestionFactoryProtocol {
     }
 
     func reset() {
-        movies = []
+        movies.removeAll()
     }
 }
-
