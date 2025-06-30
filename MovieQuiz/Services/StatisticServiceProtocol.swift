@@ -3,13 +3,10 @@
 
 import Foundation
 
+/// Интерфейс для хранения и форматирования статистики
 protocol StatisticServiceProtocol {
+    /// Сохраняет текущее число правильных ответов и общее количество вопросов
     func store(correct count: Int, total questions: Int)
-
-    var gamesCount: Int { get }
-
-    var bestGame: GameRecord { get }
-
-    var averageAccuracy: Double { get }
+    /// Возвращает итоговое сообщение с результатами
+    func makeResultMessage() -> String
 }
-
