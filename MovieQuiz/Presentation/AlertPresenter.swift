@@ -20,13 +20,11 @@ final class AlertPresenter {
             message: model.message,
             preferredStyle: .alert
         )
-        alert.view.accessibilityIdentifier = "Game results"
-
         let action = UIAlertAction(title: model.buttonText, style: .default) { _ in
-            model.completion()
+            model.completion?()
         }
         alert.addAction(action)
-
-        viewController?.present(alert, animated: true, completion: nil)
+        viewController?.present(alert, animated: true)
     }
 }
+
