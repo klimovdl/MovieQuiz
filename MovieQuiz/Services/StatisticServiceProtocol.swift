@@ -3,10 +3,19 @@
 
 import Foundation
 
-/// Интерфейс для хранения и форматирования статистики
+struct GameRecord: Codable, Comparable {
+    let correct: Int
+    let total: Int
+    let date: Date
+
+    static func < (lhs: GameRecord, rhs: GameRecord) -> Bool {
+        Double(lhs.correct)/Double(lhs.total) < Double(rhs.correct)/Double(rhs.total)
+    }
+}
+
 protocol StatisticServiceProtocol {
-    /// Сохраняет текущее число правильных ответов и общее количество вопросов
-    func store(correct count: Int, total questions: Int)
-    /// Возвращает итоговое сообщение с результатами
-    func makeResultMessage() -> String
+    var gamesCount: Int { get }
+    var bestGame: GameRecord { get }
+    var totalAccuracy: Double { get }
+    func store(correct: Int, total: Int)
 }

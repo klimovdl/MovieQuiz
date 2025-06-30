@@ -3,79 +3,54 @@
 
 import Foundation
 
-struct GameRecord: Codable {
-    let correct: Int
-    let total: Int
-    let date: Date
-}
-
 final class StatisticServiceImplementation: StatisticServiceProtocol {
-    private let userDefaults = UserDefaults.standard
-
     private enum Keys {
-        static let gamesCount    = "stat_gamesCount"
-        static let bestGame      = "stat_bestGame"
-        static let totalAccuracy = "stat_totalAccuracy"
+        static let gamesCount      = "gamesCount"
+        static let bestGame        = "bestGame"
+        static let correctAnswers  = "correctAnswers"
+        static let totalAnswers    = "totalAnswers"
     }
 
-    func store(correct count: Int, total questions: Int) {
-        // Увеличиваем общее число сыгранных квизов
-        let newGamesCount = gamesCount + 1
-        userDefaults.set(newGamesCount, forKey: Keys.gamesCount)
-
-        // Добавляем точность этого раунда к накопленной
-        let thisAccuracy = Double(count) / Double(questions) * 100
-        let newTotalAccuracy = totalAccuracySum + thisAccuracy
-        userDefaults.set(newTotalAccuracy, forKey: Keys.totalAccuracy)
-
-        // Обновляем рекорд, если этот результат лучше
-        let currentBest = bestGame
-        if count > currentBest.correct {
-            let newBest = GameRecord(correct: count, total: questions, date: Date())
-            if let data = try? JSONEncoder().encode(newBest) {
-                userDefaults.set(data, forKey: Keys.bestGame)
-            }
-        }
-    }
+    private let defaults = UserDefaults.standard
+    private let decoder = JSONDecoder()
+    private let encoder = JSONEncoder()
 
     var gamesCount: Int {
-        userDefaults.integer(forKey: Keys.gamesCount)
-    }
-
-    private var totalAccuracySum: Double {
-        userDefaults.double(forKey: Keys.totalAccuracy)
-    }
-
-    var averageAccuracy: Double {
-        guard gamesCount > 0 else { return 0 }
-        return totalAccuracySum / Double(gamesCount)
+        defaults.integer(forKey: Keys.gamesCount)
     }
 
     var bestGame: GameRecord {
-        if let data = userDefaults.data(forKey: Keys.bestGame),
-           let record = try? JSONDecoder().decode(GameRecord.self, from: data) {
+        if let data = defaults.data(forKey: Keys.bestGame),
+           let record = try? decoder.decode(GameRecord.self, from: data) {
             return record
         }
-        // если ещё нет рекорда — возвращаем «пустую» запись
         return GameRecord(correct: 0, total: 0, date: Date())
     }
 
-    // MARK: — Формирование итогового сообщения
-    func makeResultMessage() -> String {
-        // Данные о лучшем результате
-        let best = bestGame
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateStyle = .short
-        dateFormatter.timeStyle = .medium
-        let bestDate = dateFormatter.string(from: best.date)
+    var totalAccuracy: Double {
+        let total = defaults.integer(forKey: Keys.totalAnswers)
+        guard total > 0 else { return 0 }
+        let correct = defaults.double(forKey: Keys.correctAnswers)
+        return correct / Double(total) * 100
+    }
 
-        // Форматируем среднюю точность
-        let formattedAccuracy = String(format: "%.2f", averageAccuracy)
+    func store(correct: Int, total: Int) {
+        // обновляем общий счёт
+        let prevCorrect = defaults.double(forKey: Keys.correctAnswers)
+        let prevTotal   = defaults.integer(forKey: Keys.totalAnswers)
+        defaults.set(prevCorrect + Double(correct), forKey: Keys.correctAnswers)
+        defaults.set(prevTotal + total, forKey: Keys.totalAnswers)
 
-        return """
-        Количество сыгранных квизов: \(gamesCount)
-        Рекорд: \(best.correct)/\(best.total) (\(formattedAccuracy)%) — \(bestDate)
-        Средняя точность: \(formattedAccuracy)%
-        """
+        // обновляем количество игр
+        let newGamesCount = defaults.integer(forKey: Keys.gamesCount) + 1
+        defaults.set(newGamesCount, forKey: Keys.gamesCount)
+
+        // обновляем лучший рекорд
+        let currentRecord = GameRecord(correct: correct, total: total, date: Date())
+        if currentRecord > bestGame {
+            if let data = try? encoder.encode(currentRecord) {
+                defaults.set(data, forKey: Keys.bestGame)
+            }
+        }
     }
 }
